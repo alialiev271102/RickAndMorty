@@ -1,39 +1,13 @@
 "use client";
 import axios from "axios";
 import { useState } from "react"
-
-interface Character {
-    id: number,
-    image: string,
-    name: string,
-    status: string,
-    species: string,
-    location: {name: string}
-}
+import ICharacter from "../models/ICharacter";
+import useCharacterSearch from "../hooks/useChaarcterSearch";
 
 const CharacterSearch = () => {
-    const [name, setName] = useState("");
-    const [charactersList, setCharactrersList] = useState<Character[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
-
-    const searchCharacter = async () => {
-        if(!name.trim()) return;
-        setLoading(true);
-        setError("");
-        setCharactrersList([]);
-
-        try {
-            const res = await axios.get(`https://rickandmortyapi.com/api/character/?name=${name}`);
-            console.log(res.data.results)
-            setCharactrersList(res.data.results)
-        }catch (err) {
-            setError("Персонаж не найден");
-            console.log(err)
-        } finally {
-            setLoading(false);
-        }
-    }
+   
+    const { name, setName, charactersList, loading, error, searchCharacter } = useCharacterSearch();
+    
     return(
         <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-24">
             <h1 className="text-4xl font-bold mb-6">Find Rick and Mortys Characters</h1>
@@ -43,16 +17,17 @@ const CharacterSearch = () => {
                     placeholder="Rick Sanchez..." 
                     value={name} 
                     onChange={(e) => setName(e.target.value)}
-                    className="flex-1 px-4 py-2 rounded-lg border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-4 py-2 rounded-lg border border-gray-600 bg-gray-800 text-white"
                 />
                 <button
                 onClick={searchCharacter}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-bold"
                 >
-                    Find
+                    {loading ? 
+                     <div className="w-6 h-6 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div> :
+                     "Find"}
                 </button>
             </div>
-            {loading && <p className="text-yellow-400">Download </p>}
             {error && <p className="text-red-500">{error}</p>}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl">
                 {charactersList.map((character) => (
